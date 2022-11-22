@@ -38,12 +38,21 @@ export const Login: React.FC = () => {
             >
                 <h1>Login</h1>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <Input placeholder="username..." {...register("username", {required: true})}/>
+                    <Input
+                        placeholder="username..."
+                        {...register("username", {required: true})}
+                        error={!!errors.username}
+                    />
                     <br/>
                     {errors.username && <span className="validation-error-text">Username is required.</span>}
 
                     <br/>
-                    <Input placeholder="password..." type="password" {...register("password", {required: "Password is required."})}/>
+                    <Input
+                        placeholder="password..."
+                        type="password"
+                        {...register("password", {required: "Password is required."})}
+                        error={!!errors.password}
+                    />
                     <br/>
                     {errors.password && <span className="validation-error-text">{errors.password.message}</span>}
 

@@ -1,41 +1,51 @@
 
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
-import { IEmployeeData } from "../types/IEmployeeData";
+import { useContext, useState } from "react";
+import { IEmployeeData, ISaveableEmployeeData } from "../types/IEmployeeData";
 import { EmployeeEntry } from "../components/EmployeEntry";
 import { AlertDialogue } from "../components/AlertDialog";
 import { Layout } from "../components/Layout";
 import { UnauthorizedPage } from "./401";
 import { UserContext } from "../components/UserContext";
-import { Container } from "@mui/material";
+import { Container, Fab, Typography } from "@mui/material";
+import { useFetch } from "../hooks/useFetch";
+import { IAPIResponse } from "../types/IAPIResponse";
+import { EmployeeFormDialogue } from "../components/EmployeeCreateOrEditDialog";
+import AddIcon from '@mui/icons-material/Add';
 
 export interface IModalData {
     isOpen: boolean
     employeeId: string
+    endpointUrl?: string
+    employeeDetails?: IEmployeeData
 }
 
-export const EmployeeListPage: React.FC = (children) => {
+export const EmployeeListPage: React.FC = () => {
     const { username } = useContext(UserContext);
-    const [employeeData, setEmployeeData] = useState([{} as IEmployeeData]);
-    const [modalData, setModalData] = useState({} as IModalData);
+    const { data, loading, refetch } = useFetch<IAPIResponse<ISaveableEmployeeData[]>>("/api/emp/employees");
+    const [ alertModalData, setAlertModalData ] = useState({} as IModalData);
+    const [ employeeFormModalData, setEmployeeFormModalData ] = useState({} as IModalData);
 
-    useEffect(() => {
-        axios.get("/api/emp/employees")
-            .then((response) => {
-                setEmployeeData(response.data.content);
-            })
-            .catch((err) => {
-                setEmployeeData([]);
-                console.error(err);
-            });
-    }, [employeeData]);
-
-    function handleModalOpen(employeeId: string) {
-        setModalData({isOpen: true, employeeId});
+    function handleAlertModalOpen(employeeId: string) {
+        setAlertModalData({isOpen: true, employeeId});
     }
 
-    function onModalClose() {
-        setModalData({isOpen: false, employeeId: modalData.employeeId});
+    function onAlertModalClose() {
+        setAlertModalData({isOpen: false, employeeId: ""});
+    }
+
+    function handleEmployeeDataModalOpen(postUrl: string, employeeData?: IEmployeeData) {
+        setEmployeeFormModalData({isOpen: true, employeeId: "", endpointUrl: postUrl, employeeDetails: employeeData});
+    }
+
+    function onEmployeeDataModalClose() {
+        setEmployeeFormModalData({
+            isOpen: false,
+            employeeId: "",
+            endpointUrl: employeeFormModalData.endpointUrl,
+            employeeDetails: employeeFormModalData.employeeDetails
+        });
+        refetch();
     }
 
     if (username === null) {
@@ -45,42 +55,89 @@ export const EmployeeListPage: React.FC = (children) => {
     return (
         <Layout imgUrl="https://wallpaperaccess.com/full/4268145.jpg">
             <AlertDialogue
-                isOpen={modalData.isOpen}
+                isOpen={alertModalData.isOpen}
                 title="Delete employee?"
                 description="Are you sure you wish to delete this employee?"
                 confirmText="Yes"
                 rejectText="Cancel"
                 onConfirm={() => {
-                    axios.delete(`/api/emp/employees/${modalData.employeeId}`)
+                    axios.delete(`/api/emp/employees/${alertModalData.employeeId}`)
                         .then((result) => {
-                            console.log(result);
+                            refetch();
                         })
                         .catch(console.error);
 
-                    onModalClose();
+                    onAlertModalClose();
                 }}
                 onReject={() => {
-                    onModalClose();
-                    setModalData({isOpen: false, employeeId: modalData.employeeId});
+                    onAlertModalClose();
                 }}
-                onClose={onModalClose}
+                onClose={onAlertModalClose}
             />
-            {employeeData.length === 0 && <h2 style={{color: "red"}}>No records to show.</h2>}
-
+            <EmployeeFormDialogue
+                isOpen={employeeFormModalData.isOpen}
+                title="Employee Data"
+                description=""
+                rejectText="Cancel"
+                onConfirm={onEmployeeDataModalClose}
+                onReject={onEmployeeDataModalClose}
+                onClose={onEmployeeDataModalClose}
+                postUrl={employeeFormModalData.endpointUrl!}
+                defaultData={employeeFormModalData.employeeDetails}
+            />
             <Container
                 fixed
-                maxWidth="sm"
+                maxWidth={false}
                 style={{
-                    backgroundColor: "#31313131"
+                    marginTop: "2%",
+                    paddingTop: "2%",
+                    backgroundColor: "#31313131",
+                    overflow: "auto"
                 }}
             >
-                {employeeData.length > 0 && (
-                    employeeData.map((value: IEmployeeData) => (
-                        <EmployeeEntry employeeData={value} handleModalOpen={handleModalOpen}/>
+                {(!loading && data.content.length === 0) && (
+                    <Typography
+                        variant="h2"
+                        style={{
+                            color: "red",
+                            justifyContent: "center"
+                        }}
+                        sx={{
+                            mr: 2,
+                            display: { xs: 'none', md: 'flex' },
+                            fontFamily: 'monospace',
+                            fontWeight: 700,
+                            letterSpacing: '.2rem',
+                        }}
+                    >
+                        No records to show.
+                    </Typography>
+                )}
+                {(!loading && data.content.length > 0) && (
+                    data.content.map((value: ISaveableEmployeeData) => (
+                        <EmployeeEntry
+                            employeeData={value}
+                            handleEditModalOpen={handleEmployeeDataModalOpen}
+                            handleDeleteModalOpen={handleAlertModalOpen}
+                        />
                     ))
                 )}
             </Container>
-
+            <Fab
+                variant="extended"
+                color="primary"
+                onClick={() => {
+                    handleEmployeeDataModalOpen("/api/emp/employees")
+                }}
+                style={{
+                    position: "fixed",
+                    bottom: "5%",
+                    right: "20%"
+                }}
+            >
+                <AddIcon sx={{ mr: 1}}/>
+                Create new
+            </Fab>
         </Layout>
     );
 }

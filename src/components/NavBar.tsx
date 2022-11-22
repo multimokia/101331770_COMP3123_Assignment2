@@ -10,7 +10,7 @@ import { UserContext } from './UserContext';
 
 export const NavBar: React.FC = () => {
     const { username } = useContext(UserContext);
-    console.log(username);
+
     return (
         <AppBar position="static">
             <Container maxWidth={false}>

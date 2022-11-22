@@ -35,6 +35,7 @@
   "scripts": {
     "start": "node build/server/index.js",
     "build": "react-scripts build && powershell mklink /J .\\build\\server\\ ..\\101331770_COMP3123_Assignment1\\build\\",
+    "suffer": "npm run build && npm run start",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

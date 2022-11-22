@@ -9,11 +9,12 @@ export const ErrorPage: React.FC<{errorCode: number, errorText: string}> = ({err
                 style={{
                     justifySelf: "center",
                     maxWidth: "50%",
-                    marginTop: "15%",
+                    marginTop: "24%",
                     paddingTop: "2%",
                     paddingBottom: "2%",
                     paddingLeft: "5%",
-                    paddingRight: "5%"
+                    paddingRight: "5%",
+                    height: "fit-content"
                 }}
             >
                 <h1 style={{fontSize: "400%"}}>{errorCode}</h1>
