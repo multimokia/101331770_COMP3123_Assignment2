@@ -10,12 +10,19 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@types/bcrypt": "^5.0.0",
+    "@types/cors": "^2.8.12",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.3",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",
     "@types/styled-components": "^5.1.26",
     "axios": "^1.1.3",
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.7.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.39.3",
@@ -26,8 +33,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "node build/server/index.js",
+    "build": "react-scripts build && powershell mklink /J .\\build\\server\\ ..\\101331770_COMP3123_Assignment1\\build\\",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -50,6 +57,7 @@
     ]
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^8.5.9",
     "react-router-dom": "^6.4.3"
   }
 }

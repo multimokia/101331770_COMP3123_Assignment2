@@ -1,27 +1,42 @@
-import { Card, Link } from "@mui/material";
+import { Card, Table, TableBody, TableRow, TableCell, Accordion, AccordionDetails, AccordionSummary, Button, Grid } from "@mui/material";
 import { IEmployeeData } from "../types/IEmployeeData";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-export const EmployeeEntry: React.FC<{employeeData: IEmployeeData}> = (children, employeeData: IEmployeeData) => {
+export const EmployeeEntry: React.FC<{employeeData: IEmployeeData, handleModalOpen: (employeeId: string) => void}> = ({employeeData, handleModalOpen}) => {
     return (
         <Card className="employee-data">
-            <h2>{employeeData.first_name} {employeeData.last_name}</h2>
-            <hr/>
-            <h4>Email: </h4>{employeeData.email}
-            <h4>Gender: </h4>{employeeData.gender}
-            <h4>Salary: </h4>${employeeData.salary}
-
-            <hr/>
-            <Link
-                href={`/employee/edit/${employeeData._id}`}
-                className="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium css-1e6y48t-MuiButtonBase-root-MuiButton-root"
-            >Edit...</Link>
-            <Link
-                href={`/employee/edit/${employeeData._id}`}
-                className="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium css-1e6y48t-MuiButtonBase-root-MuiButton-root"
-                style={{
-                    color: "red"
-                }}
-            >Delete...</Link>
+            <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    {employeeData.first_name} {employeeData.last_name}
+                </AccordionSummary>
+                <AccordionDetails>
+                    <Table>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell>Email:</TableCell>
+                                <TableCell>{employeeData.email}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>Gender:</TableCell>
+                                <TableCell>{employeeData.gender}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>Salary:</TableCell>
+                                <TableCell>${employeeData.salary}</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </AccordionDetails>
+                <hr/>
+                <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                        <Button href={`/employee/edit/${employeeData._id}`}>Edit...</Button>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Button onClick={() => handleModalOpen(employeeData._id)} style={{color: "red"}}>Delete...</Button>
+                    </Grid>
+                </Grid>
+            </Accordion>
         </Card>
     )
 }

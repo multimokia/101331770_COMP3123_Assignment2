@@ -1,8 +1,5 @@
-export const NotFoundPage: React.FC = (children) => {
-    return (
-        <>
-            <h1>404</h1>
-            <h4>The fuck are you doing here?</h4>
-        </>
-    )
+import { ErrorPage } from "../components/ErrorPage"
+
+export const NotFoundPage: React.FC = () => {
+    return <ErrorPage errorCode={404} errorText="You destroyed the fabric of spacetime."/>
 }

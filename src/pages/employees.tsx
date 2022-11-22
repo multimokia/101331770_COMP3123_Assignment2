@@ -1,10 +1,13 @@
-import { Button, Card, Link } from "@mui/material";
-import { NavBar } from "../components/NavBar";
+
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { IEmployeeData } from "../types/IEmployeeData";
 import { EmployeeEntry } from "../components/EmployeEntry";
 import { AlertDialogue } from "../components/AlertDialog";
+import { Layout } from "../components/Layout";
+import { UnauthorizedPage } from "./401";
+import { UserContext } from "../components/UserContext";
+import { Container } from "@mui/material";
 
 export interface IModalData {
     isOpen: boolean
@@ -12,12 +15,12 @@ export interface IModalData {
 }
 
 export const EmployeeListPage: React.FC = (children) => {
-
+    const { username } = useContext(UserContext);
     const [employeeData, setEmployeeData] = useState([{} as IEmployeeData]);
     const [modalData, setModalData] = useState({} as IModalData);
 
     useEffect(() => {
-        axios.get("http://23.133.249.134:8888/api/emp/employees")
+        axios.get("/api/emp/employees")
             .then((response) => {
                 setEmployeeData(response.data.content);
             })
@@ -25,43 +28,22 @@ export const EmployeeListPage: React.FC = (children) => {
                 setEmployeeData([]);
                 console.error(err);
             });
-    }, []);
+    }, [employeeData]);
 
     function handleModalOpen(employeeId: string) {
         setModalData({isOpen: true, employeeId});
-    }
-
-    if (employeeData.length === 0) {
-        return (
-            <>
-                <NavBar/>
-                <img className="backdrop" src="https://wallpaperaccess.com/full/4268145.jpg" alt="a splash background of space"/>
-                <div className="centered-flex full-viewport">
-                    <Card
-                        className="frosted-glass-container"
-                        style={{
-                            marginTop: "15%",
-                            paddingTop: "2%",
-                            paddingBottom: "2%",
-                            paddingLeft: "5%",
-                            paddingRight: "5%"
-                        }}
-                    >
-                        <h2 style={{color: "red"}}>No records to show.</h2>
-                    </Card>
-                </div>
-            </>
-        );
     }
 
     function onModalClose() {
         setModalData({isOpen: false, employeeId: modalData.employeeId});
     }
 
+    if (username === null) {
+        return <UnauthorizedPage/>
+    }
+
     return (
-        <>
-            <NavBar/>
-            <img className="backdrop" src="https://wallpaperaccess.com/full/4268145.jpg" alt="a splash background of space"/>
+        <Layout imgUrl="https://wallpaperaccess.com/full/4268145.jpg">
             <AlertDialogue
                 isOpen={modalData.isOpen}
                 title="Delete employee?"
@@ -69,7 +51,7 @@ export const EmployeeListPage: React.FC = (children) => {
                 confirmText="Yes"
                 rejectText="Cancel"
                 onConfirm={() => {
-                    axios.delete(`http://23.133.249.134:8888/emp/employee/${modalData.employeeId}`)
+                    axios.delete(`/api/emp/employees/${modalData.employeeId}`)
                         .then((result) => {
                             console.log(result);
                         })
@@ -83,42 +65,22 @@ export const EmployeeListPage: React.FC = (children) => {
                 }}
                 onClose={onModalClose}
             />
-            <div className="centered-flex full-viewport">
-                <div
-                    className="frosted-glass-container"
-                    style={{
-                        marginTop: "15%",
-                        paddingTop: "2%",
-                        paddingBottom: "2%",
-                        paddingLeft: "5%",
-                        paddingRight: "5%",
-                        minWidth: "80%",
-                        minHeight: "80%"
-                    }}
-                >
-                    {employeeData.map((value: IEmployeeData) => (
-                        <Card key={value._id} className="employee-data">
-                            <h2>{value.first_name} {value.last_name}</h2>
-                            <hr/>
-                            <h4>Email: </h4>{value.email}
-                            <h4>Gender: </h4>{value.gender}
-                            <h4>Salary: </h4>${value.salary}
+            {employeeData.length === 0 && <h2 style={{color: "red"}}>No records to show.</h2>}
 
-                            <hr/>
-                            <Button
-                                href={`/employee/edit/${value._id}`}
-                                className="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium css-1e6y48t-MuiButtonBase-root-MuiButton-root"
-                            >Edit...</Button>
-                            <Button
-                                onClick={() => handleModalOpen(value._id)}
-                                style={{
-                                    color: "red"
-                                }}
-                            >Delete...</Button>
-                        </Card>
-                    ))}
-                </div>
-            </div>
-        </>
+            <Container
+                fixed
+                maxWidth="sm"
+                style={{
+                    backgroundColor: "#31313131"
+                }}
+            >
+                {employeeData.length > 0 && (
+                    employeeData.map((value: IEmployeeData) => (
+                        <EmployeeEntry employeeData={value} handleModalOpen={handleModalOpen}/>
+                    ))
+                )}
+            </Container>
+
+        </Layout>
     );
 }
