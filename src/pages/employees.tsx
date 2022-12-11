@@ -116,6 +116,7 @@ export const EmployeeListPage: React.FC = () => {
                 {(!loading && data.content.length > 0) && (
                     data.content.map((value: ISaveableEmployeeData) => (
                         <EmployeeEntry
+                            key={value._id}
                             employeeData={value}
                             handleEditModalOpen={handleEmployeeDataModalOpen}
                             handleDeleteModalOpen={handleAlertModalOpen}

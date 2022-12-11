@@ -69,7 +69,16 @@ export const EmployeeDetailsForm: React.FC<{
                         type="number"
                         defaultValue={presetValues?.salary || ""}
                         fullWidth={true}
-                        {...register("salary", {required: "Salary is required."})}
+                        { ...register(
+                            "salary",
+                            {
+                                required: "Salary is required.",
+                                pattern: {
+                                    value: /^(0|[1-9]\d*)(\.\d+)?$/,
+                                    message: "Input must be a number"},
+                                valueAsNumber: true
+                            }
+                        )}
                         error={!!errors.salary}
                     />
                     <br/>

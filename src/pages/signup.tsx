@@ -1,5 +1,5 @@
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Card, Input, Button, Link } from "@mui/material";
+import { Card, Input, Button } from "@mui/material";
 import axios from "axios";
 import { Layout } from "../components/Layout";
 import { ISignupInput } from "../types/ISignupInput";
@@ -7,7 +7,7 @@ import { ISignupInput } from "../types/ISignupInput";
 export const Signup: React.FC = () => {
     const { register, handleSubmit, setError, formState: { errors } } = useForm<ISignupInput>();
     const onSubmit: SubmitHandler<ISignupInput> = (data: ISignupInput) => {
-        axios.post("https://23.133.249.130:3000/api/user/signup", data)
+        axios.post("/api/user/signup", data)
             .then(x => {
                 if (data.password !== data.confirmpassword) {
                     setError("password", {message: "Passwords do not match."});
